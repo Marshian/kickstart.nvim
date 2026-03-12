@@ -63,6 +63,9 @@ vim.o.splitbelow = true
 --   and `:help lua-guide-options`
 vim.o.list = true
 vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+vim.opt.expandtab = true
 
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
@@ -194,36 +197,6 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added via a link or github org/name. To run setup automatically, use `opts = {}`
-  { 'NMAC427/guess-indent.nvim', opts = {} },
-
-  -- Alternatively, use `config = function() ... end` for full control over the configuration.
-  -- If you prefer to call `setup` explicitly, use:
-  --    {
-  --        'lewis6991/gitsigns.nvim',
-  --        config = function()
-  --            require('gitsigns').setup({
-  --                -- Your gitsigns configuration here
-  --            })
-  --        end,
-  --    }
-  --
-  -- Here is a more advanced example where we pass configuration
-  -- options to `gitsigns.nvim`.
-  --
-  -- See `:help gitsigns` to understand what the configuration keys do
-  { -- Adds git related signs to the gutter, as well as utilities for managing changes
-    'lewis6991/gitsigns.nvim',
-    opts = {
-      signs = {
-        add = { text = '+' },
-        change = { text = '~' },
-        delete = { text = '_' },
-        topdelete = { text = '‾' },
-        changedelete = { text = '~' },
-      },
-    },
-  },
-
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -588,7 +561,7 @@ require('lazy').setup({
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --  See `:help lsp-config` for information about keys and how to configure
       local servers = {
-        -- clangd = {},
+        clangd = require 'clangd_config',
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
@@ -798,12 +771,10 @@ require('lazy').setup({
     --'xero/miasma.nvim',
     --'folke/tokyonight.nvim',
     'bluz71/vim-nightfly-colors',
-    name = "nightfly",
+    name = 'nightfly',
     lazy = false,
-    priority = 1000, -- Make sure to load this before all the other start plugins.    
-    config = function()
-      vim.cmd.colorscheme 'nightfly'
-    end,
+    priority = 1000, -- Make sure to load this before all the other start plugins.
+    config = function() vim.cmd.colorscheme 'nightfly' end,
   },
 
   -- Highlight todo, notes, etc in comments
@@ -847,9 +818,11 @@ require('lazy').setup({
 
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    branch = 'main',
     config = function()
+      local treesitter = require 'nvim-treesitter'
       local filetypes = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
-      require('nvim-treesitter').install(filetypes)
+      treesitter.install(filetypes)
       vim.api.nvim_create_autocmd('FileType', {
         pattern = filetypes,
         callback = function() vim.treesitter.start() end,
@@ -896,30 +869,8 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  require 'kickstart.plugins.debug',
-  require 'kickstart.plugins.indent_line',
-  require 'kickstart.plugins.lint',
-  require 'kickstart.plugins.autopairs',
-  require 'kickstart.plugins.neo-tree',
-  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  { import = 'plugins' },
 
-  --{
-  --  'nvim-neo-tree/neo-tree.nvim',
-  --  branch = 'v3.x',
-  --  dependencies = {
-  --    'nvim-lua/plenary.nvim',
-  --    'MunifTanjim/nui.nvim',
-  --    'nvim-tree/nvim-web-devicons',
-  --  },
-  --  lazy = false,
-  --},
-
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    This is the easiest way to modularize your config.
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
-  -- { import = 'custom.plugins' },
-  --
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
   -- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
@@ -949,9 +900,7 @@ require('lazy').setup({
 local cmp = require 'cmp'
 cmp.setup {
   snippet = {
-    expand = function(args)
-      vim.fn['vsnip#anonymous'](args.body)
-    end,
+    expand = function(args) vim.fn['vsnip#anonymous'](args.body) end,
   },
   mapping = {
     ['<C-p>'] = cmp.mapping.select_prev_item(),
