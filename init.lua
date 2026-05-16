@@ -6,6 +6,7 @@ vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
+vim.o.guifont = 'Source Code Pro:h12:#h-slight'
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -17,6 +18,8 @@ vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 -- vim.o.relativenumber = true
+
+vim.o.wrap = false
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
@@ -562,6 +565,8 @@ require('lazy').setup({
       --  See `:help lsp-config` for information about keys and how to configure
       local servers = {
         clangd = require 'clangd_config',
+        yamlls = require 'yaml-ls',
+
         -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
@@ -626,11 +631,101 @@ require('lazy').setup({
   {
     'mrcjkb/rustaceanvim',
   },
-
   {
     'lambdalisue/suda.vim',
   },
-
+  {
+    'pmizio/typescript-tools.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+    opts = {},
+  },
+  {
+    'pipoprods/nvm.nvim',
+    config = true,
+  },
+  --
+  -- Code Companion - LLM integration
+  --
+  {
+    'olimorris/codecompanion.nvim',
+    version = '^19.0.0',
+    opts = {
+      adapters = {
+        http = {
+          ['llama.cpp'] = function()
+            return require('codecompanion.adapters').extend('openai_compatible', {
+              env = {
+                url = 'http://127.0.0.1:8045',
+                chat_url = '/v1/chat/completions',
+              },
+              handlers = {
+                parse_message_meta = function(self, data)
+                  local extra = data.extra
+                  if extra and extra.reasoning_content then
+                    data.output.reasoning = { content = extra.reasoning_content }
+                    if data.output.content == '' then data.output.content = nil end
+                  end
+                  return data
+                end,
+              },
+            })
+          end,
+        },
+      },
+      interactions = {
+        chat = {
+          adapter = {
+            name = 'llama.cpp',
+            model = 'qwen/Qwen3.5-27B.Q4_K_M',
+          },
+        },
+        inline = {
+          adapter = {
+            name = 'llama.cpp',
+            model = 'qwen/Qwen3.5-27B.Q4_K_M',
+          },
+        },
+      },
+    },
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'nvim-treesitter/nvim-treesitter',
+    },
+  },
+  {
+    'HakonHarnes/img-clip.nvim',
+    opts = {
+      filetypes = {
+        codecompanion = {
+          prompt_for_file_name = false,
+          template = '[Image]($FILE_PATH)',
+          use_absolute_path = true,
+        },
+      },
+    },
+  },
+  {
+    'OXY2DEV/markview.nvim',
+    lazy = false,
+    opts = {
+      preview = {
+        filetypes = {},
+        ignore_buftypes = {},
+      },
+    },
+  },
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    ft = { 'markdown', 'codecompanion' },
+    opts = {
+      preview = {
+        enabled = false,
+      },
+      code = {
+        sign = true,
+      },
+    },
+  },
   { -- Autoformat
     'stevearc/conform.nvim',
     event = { 'BufWritePre' },
@@ -745,6 +840,9 @@ require('lazy').setup({
 
       sources = {
         default = { 'lsp', 'path', 'snippets' },
+        per_filetype = {
+          codecompanion = { 'codecompanion' },
+        },
       },
 
       snippets = { preset = 'luasnip' },
