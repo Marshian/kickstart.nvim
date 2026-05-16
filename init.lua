@@ -725,7 +725,7 @@ require('lazy').setup({
         -- <c-k>: Toggle signature help
         --
         -- See :h blink-cmp-config-keymap for defining your own keymap
-        preset = 'default',
+        preset = 'super-tab',
 
         -- For more advanced Luasnip keymaps (e.g. selecting choice nodes, expansion) see:
         --    https://github.com/L3MON4D3/LuaSnip?tab=readme-ov-file#keymaps
@@ -830,36 +830,6 @@ require('lazy').setup({
     end,
   },
 
-  -- The following set of plugins allow us to query Neovim’s LSPs, and other sources,
-  -- to present the auto-complete drop-down menu while typing code.
-  --
-  -- Thanks to these plugins, and because we have already attached rust-analyzer to
-  -- Neovim’s LSP, we will be able to get nice IDE-like auto-completion when we work
-  -- on a Cargo project:
-  {
-    'hrsh7th/cmp-buffer',
-  },
-  {
-    'hrsh7th/cmp-nvim-lsp',
-  },
-  {
-    'hrsh7th/cmp-nvim-lsp-signature-help',
-  },
-  {
-    'hrsh7th/cmp-nvim-lua',
-  },
-  {
-    'hrsh7th/cmp-path',
-  },
-  {
-    'hrsh7th/cmp-vsnip',
-  },
-  {
-    'hrsh7th/nvim-cmp',
-  },
-  {
-    'hrsh7th/vim-vsnip',
-  },
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
@@ -896,55 +866,6 @@ require('lazy').setup({
     },
   },
 })
-
-local cmp = require 'cmp'
-cmp.setup {
-  snippet = {
-    expand = function(args) vim.fn['vsnip#anonymous'](args.body) end,
-  },
-  mapping = {
-    ['<C-p>'] = cmp.mapping.select_prev_item(),
-    ['<C-n>'] = cmp.mapping.select_next_item(),
-    -- Add tab support
-    ['<S-Tab>'] = cmp.mapping.select_prev_item(),
-    ['<Tab>'] = cmp.mapping.select_next_item(),
-    ['<C-S-f>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<C-e>'] = cmp.mapping.close(),
-    ['<CR>'] = cmp.mapping.confirm {
-      behavior = cmp.ConfirmBehavior.Insert,
-      select = true,
-    },
-  },
-  -- Installed sources:
-  sources = {
-    { name = 'path' }, -- file paths
-    { name = 'nvim_lsp', keyword_length = 3 }, -- from language server
-    { name = 'nvim_lsp_signature_help' }, -- display function signatures with current parameter emphasized
-    { name = 'nvim_lua', keyword_length = 2 }, -- complete neovim's Lua runtime API such vim.lsp.*
-    { name = 'buffer', keyword_length = 2 }, -- source current buffer
-    { name = 'vsnip', keyword_length = 2 }, -- nvim-cmp source for vim-vsnip
-    { name = 'calc' }, -- source for math calculation
-  },
-  window = {
-    completion = cmp.config.window.bordered(),
-    documentation = cmp.config.window.bordered(),
-  },
-  formatting = {
-    fields = { 'menu', 'abbr', 'kind' },
-    format = function(entry, item)
-      local menu_icon = {
-        nvim_lsp = 'λ',
-        vsnip = '⋗',
-        buffer = 'Ω',
-        path = '🖫',
-      }
-      item.menu = menu_icon[entry.source.name]
-      return item
-    end,
-  },
-}
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
