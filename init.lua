@@ -639,10 +639,6 @@ require('lazy').setup({
     dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
     opts = {},
   },
-  {
-    'pipoprods/nvm.nvim',
-    config = true,
-  },
   --
   -- Code Companion - LLM integration
   --
@@ -964,6 +960,8 @@ require('lazy').setup({
     },
   },
 })
+
+require('plugins.nvm').setup()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
