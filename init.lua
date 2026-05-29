@@ -6,7 +6,7 @@ vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
-vim.o.guifont = 'Source Code Pro:h12:#h-slight'
+vim.o.guifont = 'SauceCodePro Nerd Font:h12:#h-slight'
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -961,7 +961,7 @@ require('lazy').setup({
   },
 })
 
-require('plugins.nvm').setup()
+require('nvm').setup()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
